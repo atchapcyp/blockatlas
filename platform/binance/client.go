@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/trustwallet/blockatlas"
+	"github.com/trustwallet/blockatlas/pkg/errors"
 	"github.com/trustwallet/blockatlas/pkg/logger"
 	"net/http"
 	"net/url"
@@ -86,6 +87,7 @@ func getAPIError(res *http.Response, desc string) error {
 	var sErr Error
 	err := json.NewDecoder(res.Body).Decode(&sErr)
 	if err != nil {
+		err = errors.E(err, errors.TypePlatformUnmarshal, errors.Params{"desc": desc, "platform": "binance"})
 		logger.Error(err, "Binance: Failed to decode error response")
 		return blockatlas.ErrSourceConn
 	}

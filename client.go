@@ -3,6 +3,7 @@ package blockatlas
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/trustwallet/blockatlas/pkg/errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -26,16 +27,20 @@ func (r *Request) Get(result interface{}, base string, path string, query url.Va
 func (r *Request) Execute(method string, url string, body io.Reader, result interface{}) error {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		return err
+		return errors.E(err, errors.TypePlatformRequest, errors.Params{"url": url, "method": method})
 	}
 	res, err := r.HttpClient.Do(req)
 	if err != nil {
-		return err
+		return errors.E(err, errors.TypePlatformRequest, errors.Params{"url": url, "method": method})
 	}
 	err = r.ErrorHandler(res, url)
 	if err != nil {
-		return err
+		return errors.E(err, errors.TypePlatformError, errors.Params{"url": url, "method": method})
 	}
 	defer res.Body.Close()
-	return json.NewDecoder(res.Body).Decode(result)
+	err = json.NewDecoder(res.Body).Decode(result)
+	if err != nil {
+		return errors.E(err, errors.TypePlatformUnmarshal, errors.Params{"url": url, "method": method})
+	}
+	return nil
 }
