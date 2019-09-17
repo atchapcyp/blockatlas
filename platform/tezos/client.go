@@ -3,7 +3,6 @@ package tezos
 import (
 	"fmt"
 	"github.com/trustwallet/blockatlas"
-	"github.com/trustwallet/blockatlas/pkg/logger"
 	"net/http"
 	"net/url"
 )
@@ -70,7 +69,6 @@ func (c *Client) GetBlockByNumber(num int64) ([]Tx, error) {
 func (c *Client) GetValidators() (validators []Validator, err error) {
 	err = c.Request.Get(&validators, c.RpcURL, "chains/main/blocks/head~32768/votes/listings", nil)
 	if err != nil {
-		logger.Error(err, "Tezos: Failed to get validators for address")
 		return validators, err
 	}
 	return validators, err

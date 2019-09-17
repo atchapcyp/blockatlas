@@ -1,10 +1,10 @@
 package tron
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"github.com/trustwallet/blockatlas"
 	"github.com/trustwallet/blockatlas/coin"
+	"github.com/trustwallet/blockatlas/pkg/errors"
 	"github.com/trustwallet/blockatlas/pkg/logger"
 	"sync"
 )
@@ -74,7 +74,8 @@ func (p *Platform) GetTokenTxsByAddress(address, token string) (blockatlas.TxPag
 
 func NormalizeTokenTransfer(srcTx *Tx, tokenInfo AssetInfo) (tx blockatlas.Tx, e error) {
 	if len(srcTx.Data.Contracts) == 0 {
-		return tx, fmt.Errorf("tron: token transfer without contract: %v - %v", tx, tokenInfo)
+		return tx, errors.E("token transfer without contract", errors.TypePlatformApi,
+			errors.Params{"tokenInfo": tokenInfo, "tx": tx, "platform": "tron"})
 	}
 	contract := &srcTx.Data.Contracts[0]
 

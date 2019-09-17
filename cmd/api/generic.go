@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/trustwallet/blockatlas"
 	"github.com/trustwallet/blockatlas/coin"
+	"github.com/trustwallet/blockatlas/pkg/logger"
 	services "github.com/trustwallet/blockatlas/services/assets"
 	"log"
 	"net/http"
@@ -86,6 +87,7 @@ func makeStakingRoute(router gin.IRouter, api blockatlas.Platform) {
 
 		validators, err := stakingAPI.GetValidators()
 		if err != nil {
+			logger.Error(err, "Failed to get validators")
 			c.JSON(http.StatusServiceUnavailable, err)
 			return
 		}

@@ -2,6 +2,7 @@ package iotex
 
 import (
 	"fmt"
+	"github.com/trustwallet/blockatlas/pkg/errors"
 	"github.com/trustwallet/blockatlas/pkg/logger"
 	"net/http"
 	"net/url"
@@ -33,7 +34,11 @@ func (c *Client) GetLatestBlock() (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return strconv.ParseInt(chainMeta.Height, 10, 64)
+	b, err := strconv.ParseInt(chainMeta.Height, 10, 64)
+	if err != nil {
+		return 0, errors.E(err, "ParseInt failed", errors.TypePlatformUnmarshal, errors.Params{"platform": "iotex"})
+	}
+	return b, nil
 }
 
 func (c *Client) GetTxsInBlock(number int64) ([]*ActionInfo, error) {
@@ -68,8 +73,7 @@ func (c *Client) GetAddressTotalTransactions(address string) (int64, error) {
 	}
 	numActions, err := strconv.ParseInt(account.AccountMeta.NumActions, 10, 64)
 	if err != nil {
-		return 0, nil
+		return 0, errors.E(err, "ParseInt failed", errors.TypePlatformUnmarshal, errors.Params{"platform": "iotex"})
 	}
-
 	return numActions, nil
 }

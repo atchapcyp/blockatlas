@@ -3,7 +3,6 @@ package tron
 import (
 	"fmt"
 	"github.com/trustwallet/blockatlas"
-	"github.com/trustwallet/blockatlas/pkg/logger"
 	"net/http"
 	"net/url"
 )
@@ -59,7 +58,6 @@ func (c *Client) GetTokenInfo(id string) (*Asset, error) {
 func (c *Client) GetValidators() (validators Validators, err error) {
 	err = c.Request.Get(&validators, c.BaseURL, "wallet/listwitnesses", nil)
 	if err != nil {
-		logger.Error(err, "Tron: Failed to get validators for address")
 		return validators, err
 	}
 	return validators, err
