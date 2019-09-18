@@ -3,7 +3,6 @@ package nebulas
 import (
 	"fmt"
 	"github.com/trustwallet/blockatlas"
-	"github.com/trustwallet/blockatlas/pkg/logger"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -48,7 +47,6 @@ func (c *Client) GetLatestBlock() (int64, error) {
 
 	err := c.Request.Get(&response, c.BaseURL, path, values)
 	if err != nil || len(response.Data) == 0 {
-		logger.Error("Nebulas: Error loading latest block height")
 		return 0, err
 	}
 

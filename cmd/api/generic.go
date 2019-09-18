@@ -6,7 +6,6 @@ import (
 	"github.com/trustwallet/blockatlas/coin"
 	"github.com/trustwallet/blockatlas/pkg/logger"
 	services "github.com/trustwallet/blockatlas/services/assets"
-	"log"
 	"net/http"
 )
 
@@ -50,15 +49,19 @@ func makeTxRoute(router gin.IRouter, api blockatlas.Platform, path string) {
 
 		switch {
 		case err == blockatlas.ErrInvalidAddr:
+			logger.Error(err, "Invalid address")
 			c.String(http.StatusBadRequest, "Invalid address")
 			return
 		case err == blockatlas.ErrNotFound:
+			logger.Error(err, "No such address")
 			c.String(http.StatusNotFound, "No such address")
 			return
 		case err == blockatlas.ErrSourceConn:
+			logger.Error(err, "Lost connection to blockchain")
 			c.String(http.StatusServiceUnavailable, "Lost connection to blockchain")
 			return
 		case err != nil:
+			logger.Error(err)
 			_ = c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
@@ -80,7 +83,7 @@ func makeStakingRoute(router gin.IRouter, api blockatlas.Platform) {
 
 		assetsValidators, err := services.GetValidators(api.Coin())
 		if err != nil {
-			log.Print("Unable to fetch validators list from the registry")
+			logger.Error(err, "Unable to fetch validators list from the registry")
 			c.JSON(http.StatusServiceUnavailable, err)
 			return
 		}
@@ -107,8 +110,8 @@ func makeCollectionRoute(router gin.IRouter, api blockatlas.Platform) {
 
 	router.GET("/collections/:owner", func(c *gin.Context) {
 		collections, err := collectionAPI.GetCollections(c.Param("owner"))
-
 		if err != nil {
+			logger.Error(err)
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, err)
 		}
 
@@ -117,8 +120,8 @@ func makeCollectionRoute(router gin.IRouter, api blockatlas.Platform) {
 
 	router.GET("/collections/:owner/collection/:collection_id", func(c *gin.Context) {
 		collectibles, err := collectionAPI.GetCollectibles(c.Param("owner"), c.Param("collection_id"))
-
 		if err != nil {
+			logger.Error(err)
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, err)
 		}
 
@@ -143,6 +146,7 @@ func makeTokenRoute(router gin.IRouter, api blockatlas.Platform) {
 
 		tl, err := tokenAPI.GetTokenListByAddress(address)
 		if err != nil {
+			logger.Error(err)
 			c.JSON(http.StatusServiceUnavailable, err)
 			return
 		}

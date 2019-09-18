@@ -3,7 +3,6 @@ package cosmos
 import (
 	"github.com/trustwallet/blockatlas"
 	"github.com/trustwallet/blockatlas/pkg/errors"
-	"github.com/trustwallet/blockatlas/pkg/logger"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -37,7 +36,6 @@ func (c *Client) GetAddrTxes(address string, tag string) (txs []Tx, err error) {
 
 	err = c.Request.Get(&txs, c.URL, "txs", query)
 	if err != nil {
-		logger.Error(err, "Cosmos: Failed to get transactions for address", logger.Params{"address": address})
 		return nil, err
 	}
 	return txs, err
